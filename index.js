@@ -2,7 +2,7 @@ const { io } = require('socket.io-client');
 
 let selectedSocketId = null;
 
-const socket = io("http://localhost:5454/", {
+const socket = io("https://license.spacecode.in/", {
     reconnectionDelayMax: 10000,
     auth: {
         token: "v3"

@@ -1,8 +1,10 @@
 const { io } = require('socket.io-client');
 
+let inScan = false;
 let deviceConnected = false;
 let selectedSocketId = null;
 let connectDeviceSerialNumber = null;
+let deviceMode = null;
 
 // const socket = io("https://license.spacecode.in/", {
 const socket = io("http://localhost:5454/", {
@@ -16,6 +18,36 @@ exports.addTagListener = async function(callback) {
     socket.on("receive_addTag", (response) => {
         console.log(response)
         callback(response);
+    })
+}
+
+exports.scanStarted = async function(callback) {
+    socket.on("receive_scanStarted", (response) => {
+        console.log(response)
+        if (response.status) {
+            inScan = true
+        }
+        callback(response);
+    })
+}
+
+exports.scanStopped = async function(callback) {
+    socket.on("receive_scanStopped", (response) => {
+        console.log(response)
+        if (response.status) {
+            inScan = false
+        }
+        callback(response)
+    })
+}
+
+exports.scanCompleted = async function(callback) {
+    socket.on("receive_scanCompleted", (response) => {
+        console.log(response)
+        if (response.status) {
+            inScan = false
+        }
+        callback(response)
     })
 }
 
@@ -54,6 +86,7 @@ exports.connectDevice = async function(deviceId, callback) {
         if (response.status) {
             deviceConnected = true;
             connectDeviceSerialNumber = response.deviceSerialNumber;
+            deviceMode = deviceId.contains(":") ? "usbMode" : "ethMode"
         }
         callback({
             "status": response.status,
@@ -77,14 +110,54 @@ exports.disconnectDevice = async function(callback) {
     })
 }
 
-exports.startScan = async function startScan(mode, callback) {
+exports.startScan = async function(mode, callback) {
+    if (!inScan) {
+        socket.emit("generic", {
+            "eventName": "startScan",
+            "socketId": selectedSocketId,
+            "deviceId": connectDeviceSerialNumber,
+            "scanMode": mode
+        }, (response) => {
+            console.log(response)
+            callback(response)
+        })
+    } else {
+        callback({
+            "status": false,
+            "message": "Already in scan"
+        })
+    }
+}
+
+exports.stopScan = async function(callback) {
     socket.emit("generic", {
-        "eventName": "startScan",
+        "eventName": "stopScan",
         "socketId": selectedSocketId,
-        "deviceId": connectDeviceSerialNumber,
-        "scanMode": mode
+        "deviceId": connectDeviceSerialNumber
     }, (response) => {
         console.log(response)
+        callback(response)
+    })
+}
+
+exports.ledOn = async function(tags, callback) {
+    socket.emit("generic", {
+        "eventName": "ledOn",
+        "socketId": selectedSocketId,
+        "deviceId": connectDeviceSerialNumber,
+        "tags": tags,
+        "mode": deviceMode
+    }, (response) => {
+        console.log(response)
+        callback(response)
+    })
+}
+
+exports.ledOff = async function(callback) {
+    socket.emit("generic", {
+        "eventName": "ledOff",
+        "socketId": selectedSocketId,
+        "deviceId": connectDeviceSerialNumber
     })
 }
 

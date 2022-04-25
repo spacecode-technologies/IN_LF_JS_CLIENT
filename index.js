@@ -4,12 +4,21 @@ let deviceConnected = false;
 let selectedSocketId = null;
 let connectDeviceSerialNumber = null;
 
-const socket = io("https://license.spacecode.in/", {
+// const socket = io("https://license.spacecode.in/", {
+const socket = io("http://localhost:5454/", {
     reconnectionDelayMax: 10000,
     auth: {
         token: "v3"
     }
 });
+
+exports.addTagListener = async function(callback) {
+    socket.on("receive_addTag", (response) => {
+        console.log(response)
+        callback(response);
+    })
+}
+
 exports.connection = async function(callback) {
     socket.emit("connection", {"deviceType": "client"}, (response) => {
         console.log(response);
@@ -65,6 +74,17 @@ exports.disconnectDevice = async function(callback) {
             connectDeviceSerialNumber = null;
         }
         callback(response);
+    })
+}
+
+exports.startScan = async function startScan(mode, callback) {
+    socket.emit("generic", {
+        "eventName": "startScan",
+        "socketId": selectedSocketId,
+        "deviceId": connectDeviceSerialNumber,
+        "scanMode": mode
+    }, (response) => {
+        console.log(response)
     })
 }
 

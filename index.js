@@ -8,9 +8,8 @@ const socket = io("https://license.spacecode.in/", {
         token: "v3"
     }
 });
-exports.connection = async function() {
-    let output = null;
-    await socket.emit("connection", {"deviceType": "client"}, (response) => {
+exports.connection = async function(callback) {
+    socket.emit("connection", {"deviceType": "client"}, (response) => {
         console.log(response);
         let sockets = response.sockets;
         let connectionSuccess = false;
@@ -23,22 +22,24 @@ exports.connection = async function() {
                     selectedSocketId = socketItem.socketId
                     connectionSuccess = true;
                     console.log(response1)
-                    output = response1.message;
+                    callback(response1)
                 })
             } else {
-                output = "No services connected";
+                callback({
+                    "status": false,
+                    "message": "No Services Connected"
+                })
             }
         })
-        return output;
     })
 }
 
-exports.connectDevice = async function(deviceId) {
+exports.connectDevice = async function(deviceId, callback) {
     socket.emit("send_connectDevice", {
         "socketId": selectedSocketId,
         deviceId
     }, (response) => {
-        console.log(response);
+        callback(response);
     })
 }
 

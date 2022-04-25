@@ -86,7 +86,7 @@ exports.connectDevice = async function(deviceId, callback) {
         if (response.status) {
             deviceConnected = true;
             connectDeviceSerialNumber = response.deviceSerialNumber;
-            deviceMode = deviceId.contains(":") ? "usbMode" : "ethMode"
+            deviceMode = deviceId.includes(":") ? "usbMode" : "ethMode"
         }
         callback({
             "status": response.status,

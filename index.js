@@ -1,6 +1,8 @@
 const { io } = require('socket.io-client');
 
+let deviceConnected = false;
 let selectedSocketId = null;
+let connectDeviceSerialNumber = null;
 
 const socket = io("https://license.spacecode.in/", {
     reconnectionDelayMax: 10000,
@@ -39,12 +41,31 @@ exports.connectDevice = async function(deviceId, callback) {
         "socketId": selectedSocketId,
         deviceId
     }, (response) => {
-        callback(response);
+        console.log(response);
+        if (response.status) {
+            deviceConnected = true;
+            connectDeviceSerialNumber = response.deviceSerialNumber;
+        }
+        callback({
+            "status": response.status,
+            "message": response.message
+        })
     })
 }
 
-exports.disconnectDevice = async function(deviceId) {
-
+exports.disconnectDevice = async function(deviceId, callback) {
+    socket.emit("generic", {
+        "eventName": "disconnectDevice",
+        "socketId": selectedSocketId,
+        "deviceId": deviceId
+    }, (response) => {
+        console.log(response)
+        if (response.status) {
+            deviceConnected = false;
+            connectDeviceSerialNumber = null;
+        }
+        callback(response);
+    })
 }
 
 

@@ -161,4 +161,15 @@ exports.ledOff = async function(callback) {
     })
 }
 
+exports.refreshTags = async function(callback) {
+    socket.emit("generic", {
+        "eventName": "refreshTags",
+        "socketId": selectedSocketId,
+        "deviceId": connectDeviceSerialNumber,
+    }, (response) => {
+        console.log(response)
+        callback(response)
+    })
+}
+
 

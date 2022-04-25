@@ -53,11 +53,11 @@ exports.connectDevice = async function(deviceId, callback) {
     })
 }
 
-exports.disconnectDevice = async function(deviceId, callback) {
+exports.disconnectDevice = async function(callback) {
     socket.emit("generic", {
         "eventName": "disconnectDevice",
         "socketId": selectedSocketId,
-        "deviceId": deviceId
+        "deviceId": connectDeviceSerialNumber
     }, (response) => {
         console.log(response)
         if (response.status) {

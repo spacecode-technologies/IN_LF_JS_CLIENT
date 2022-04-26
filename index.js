@@ -1,41 +1,43 @@
 const { io } = require('socket.io-client');
+const {disconnectDevice} = require("./index");
 
-let inScan = false;
+// let inScan = false;
 let deviceConnected = false;
 let selectedSocketId = null;
 let connectDeviceSerialNumber = null;
 let deviceMode = null;
 
-// const socket = io("https://license.spacecode.in/", {
-const socket = io("http://localhost:5454/", {
+const socket = io("https://license.spacecode.in/", {
+// const socket = io("http://localhost:5454/", {
     reconnectionDelayMax: 10000,
     auth: {
         token: "v3"
     }
 });
 
+exports.socketDisconnect = async function(callback) {
+    socket.disconnect();
+}
+
 exports.addTagListener = async function(callback) {
     socket.on("receive_addTag", (response) => {
-        console.log(response)
+        console.log("module:",response)
         callback(response);
     })
 }
 
 exports.scanStarted = async function(callback) {
     socket.on("receive_scanStarted", (response) => {
-        console.log(response)
-        if (response.status) {
-            inScan = true
-        }
+        console.log("module:", response)
         callback(response);
     })
 }
 
 exports.scanStopped = async function(callback) {
     socket.on("receive_stopScan", (response) => {
-        console.log(response)
+        console.log("module:",response)
         if (response.status) {
-            inScan = false
+            // inScan = false
         }
         callback(response)
     })
@@ -43,9 +45,9 @@ exports.scanStopped = async function(callback) {
 
 exports.scanCompleted = async function(callback) {
     socket.on("receive_scanCompleted", (response) => {
-        console.log(response)
+        console.log("module:",response)
         if (response.status) {
-            inScan = false
+            // inScan = false
         }
         callback(response)
     })
@@ -53,26 +55,35 @@ exports.scanCompleted = async function(callback) {
 
 exports.connection = async function(callback) {
     socket.emit("connection", {"deviceType": "client"}, (response) => {
-        console.log(response);
+        console.log("module:",response);
         let sockets = response.sockets;
         let connectionSuccess = false;
-        sockets.forEach((socketItem) => {
-            if (!connectionSuccess) {
-                socket.emit("generic", {
-                    "eventName": "getDevices",
-                    "socketId": socketItem.socketId
-                }, (response1) => {
-                    selectedSocketId = socketItem.socketId
-                    connectionSuccess = true;
-                    console.log(response1)
-                    callback(response1)
-                })
-            } else {
-                callback({
-                    "status": false,
-                    "message": "No Services Connected"
-                })
-            }
+        // sockets.forEach((socketItem) => {
+        //     if (!connectionSuccess) {
+        //         socket.emit("generic", {
+        //             "eventName": "getDevices",
+        //             "socketId": socketItem.socketId
+        //         }, (response1) => {
+        //             selectedSocketId = socketItem.socketId
+        //             connectionSuccess = true;
+        //             console.log(response1)
+        //             callback(response1)
+        //         })
+        //     } else {
+        //         callback({
+        //             "status": false,
+        //             "message": "No Services Connected"
+        //         })
+        //     }
+        // })
+        socket.emit("generic", {
+            "eventName": "getDevices",
+            "socketId": sockets[0].socketId
+        }, (response1) => {
+            selectedSocketId = sockets[0].socketId
+            connectionSuccess = true;
+            console.log(response1)
+            callback(response1)
         })
     })
 }
@@ -82,7 +93,7 @@ exports.connectDevice = async function(deviceId, callback) {
         "socketId": selectedSocketId,
         deviceId
     }, (response) => {
-        console.log(response);
+        console.log("module:",response);
         if (response.status) {
             deviceConnected = true;
             connectDeviceSerialNumber = response.deviceSerialNumber;
@@ -101,7 +112,7 @@ exports.disconnectDevice = async function(callback) {
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
     }, (response) => {
-        console.log(response)
+        console.log("module:",response)
         if (response.status) {
             deviceConnected = false;
             connectDeviceSerialNumber = null;
@@ -110,23 +121,19 @@ exports.disconnectDevice = async function(callback) {
     })
 }
 
+let iteration = 0
 exports.startScan = async function(mode, callback) {
-    if (!inScan) {
-        socket.emit("generic", {
-            "eventName": "startScan",
-            "socketId": selectedSocketId,
-            "deviceId": connectDeviceSerialNumber,
-            "scanMode": mode
-        }, (response) => {
-            console.log(response)
-            callback(response)
-        })
-    } else {
-        callback({
-            "status": false,
-            "message": "Already in scan"
-        })
-    }
+    socket.emit("generic", {
+        "eventName": "startScan",
+        "socketId": selectedSocketId,
+        "deviceId": connectDeviceSerialNumber,
+        "scanMode": mode
+    }, (response) => {
+        iteration++
+        console.log(iteration)
+        console.log("module 1 :",response)
+        callback(response)
+    })
 }
 
 exports.stopScan = async function(callback) {
@@ -135,7 +142,7 @@ exports.stopScan = async function(callback) {
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
     }, (response) => {
-        console.log(response)
+        console.log("module:",response)
         callback(response)
     })
 }
@@ -148,7 +155,7 @@ exports.ledOn = async function(tags, callback) {
         "tags": tags,
         "mode": deviceMode
     }, (response) => {
-        console.log(response)
+        console.log("module:",response)
         callback(response)
     })
 }
@@ -167,7 +174,7 @@ exports.refreshTags = async function(callback) {
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
     }, (response) => {
-        console.log(response)
+        console.log("module:",response)
         callback(response)
     })
 }

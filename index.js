@@ -32,7 +32,7 @@ exports.scanStarted = async function(callback) {
 }
 
 exports.scanStopped = async function(callback) {
-    socket.on("receive_scanStopped", (response) => {
+    socket.on("receive_stopScan", (response) => {
         console.log(response)
         if (response.status) {
             inScan = false

@@ -7,8 +7,8 @@ let selectedSocketId = null;
 let connectDeviceSerialNumber = null;
 let deviceMode = null;
 
-const socket = io("https://license.spacecode.in/", {
-// const socket = io("http://localhost:5454/", {
+// const socket = io("https://license.spacecode.in/", {
+const socket = io("http://localhost:5454/", {
     reconnectionDelayMax: 10000,
     auth: {
         token: "v3"
@@ -58,32 +58,18 @@ exports.connection = async function(callback) {
         console.log("module:",response);
         let sockets = response.sockets;
         let connectionSuccess = false;
-        // sockets.forEach((socketItem) => {
-        //     if (!connectionSuccess) {
-        //         socket.emit("generic", {
-        //             "eventName": "getDevices",
-        //             "socketId": socketItem.socketId
-        //         }, (response1) => {
-        //             selectedSocketId = socketItem.socketId
-        //             connectionSuccess = true;
-        //             console.log(response1)
-        //             callback(response1)
-        //         })
-        //     } else {
-        //         callback({
-        //             "status": false,
-        //             "message": "No Services Connected"
-        //         })
-        //     }
-        // })
-        socket.emit("generic", {
-            "eventName": "getDevices",
-            "socketId": sockets[0].socketId
-        }, (response1) => {
-            selectedSocketId = sockets[0].socketId
-            connectionSuccess = true;
-            console.log(response1)
-            callback(response1)
+        sockets.forEach((socketItem) => {
+            if (!connectionSuccess) {
+                socket.emit("generic", {
+                    "eventName": "getDevices",
+                    "socketId": socketItem.socketId
+                }, (response1) => {
+                    selectedSocketId = socketItem.socketId
+                    connectionSuccess = true;
+                    console.log(response1)
+                    callback(response1)
+                })
+            }
         })
     })
 }
@@ -148,12 +134,15 @@ exports.stopScan = async function(callback) {
 }
 
 exports.ledOn = async function(tags, callback) {
+    console.log("selectedSocketId", selectedSocketId)
+    console.log("deviceId", connectDeviceSerialNumber)
+    console.log("tags", tags)
     socket.emit("generic", {
         "eventName": "ledOn",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
-        "tags": tags,
-        "mode": deviceMode
+        "list": tags,
+        "mode": "ethMode"
     }, (response) => {
         console.log("module:",response)
         callback(response)
@@ -165,6 +154,8 @@ exports.ledOff = async function(callback) {
         "eventName": "ledOff",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
+    }, (response) => {
+        callback(response);
     })
 }
 

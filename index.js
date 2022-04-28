@@ -33,16 +33,6 @@ exports.scanStarted = async function(callback) {
     })
 }
 
-exports.scanStopped = async function(callback) {
-    socket.on("receive_stopScan", (response) => {
-        console.log("module:",response)
-        if (response.status) {
-            // inScan = false
-        }
-        callback(response)
-    })
-}
-
 exports.scanCompleted = async function(callback) {
     socket.on("receive_scanCompleted", (response) => {
         console.log("module:",response)

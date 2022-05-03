@@ -132,7 +132,7 @@ exports.ledOn = async function(tags, callback) {
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
         "list": tags,
-        "mode": "ethMode"
+        "mode": deviceMode
     }, (response) => {
         console.log("module:",response)
         callback(response)

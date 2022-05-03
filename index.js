@@ -73,7 +73,7 @@ exports.connectDevice = async function(deviceId, callback) {
         if (response.status) {
             deviceConnected = true;
             connectDeviceSerialNumber = response.deviceSerialNumber;
-            deviceMode = deviceId.includes(":") ? "usbMode" : "ethMode"
+            deviceMode = deviceId.includes(":") ? "ethMode" : "usbMode"
         }
         callback({
             "status": response.status,
@@ -126,6 +126,7 @@ exports.stopScan = async function(callback) {
 exports.ledOn = async function(tags, callback) {
     console.log("selectedSocketId", selectedSocketId)
     console.log("deviceId", connectDeviceSerialNumber)
+    console.log("deviceMode", deviceMode)
     console.log("tags", tags)
     socket.emit("generic", {
         "eventName": "ledOn",

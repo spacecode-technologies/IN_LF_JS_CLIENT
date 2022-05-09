@@ -19,6 +19,13 @@ exports.socketDisconnect = async function(callback) {
     socket.disconnect();
 }
 
+exports.deviceConnectListener = async function(callback) {
+    socket.on("device_connected", (response) => {
+        console.log("module: ", response)
+        callback(response)
+    })
+}
+
 exports.addTagListener = async function(callback) {
     socket.on("receive_addTag", (response) => {
         console.log("module:",response)

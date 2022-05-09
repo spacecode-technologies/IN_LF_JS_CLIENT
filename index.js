@@ -43,6 +43,20 @@ exports.scanCompleted = async function(callback) {
     })
 }
 
+exports.ledTurnedOnListener = async function(callback) {
+    socket.on("event_lighting_started", (response) => {
+        console.log("module: ", response);
+        callback(response)
+    })
+}
+
+exports.ledTurnedOffListener = async function(callback) {
+    socket.on("event_lighting_stopped", (response) => {
+        console.log("module: ", response)
+        callback(response)
+    })
+}
+
 exports.connection = async function(callback) {
     socket.emit("connection", {"deviceType": "client"}, (response) => {
         console.log("module:",response);

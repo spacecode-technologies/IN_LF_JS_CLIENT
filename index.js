@@ -19,6 +19,8 @@ exports.socketDisconnect = async function(callback) {
     socket.disconnect();
 }
 
+
+// callback to listen for device connection
 exports.deviceConnectListener = async function(callback) {
     socket.on("device_connected", (response) => {
         console.log("module: ", response)
@@ -26,6 +28,7 @@ exports.deviceConnectListener = async function(callback) {
     })
 }
 
+//callback to get the tag read by the reader
 exports.addTagListener = async function(callback) {
     socket.on("receive_addTag", (response) => {
         console.log("module:",response)
@@ -33,6 +36,7 @@ exports.addTagListener = async function(callback) {
     })
 }
 
+// callback to listen when the scan is getting started
 exports.scanStarted = async function(callback) {
     socket.on("receive_scanStarted", (response) => {
         console.log("module:", response)
@@ -40,6 +44,7 @@ exports.scanStarted = async function(callback) {
     })
 }
 
+// callback when the scan completed
 exports.scanCompleted = async function(callback) {
     socket.on("receive_scanCompleted", (response) => {
         console.log("module:",response)
@@ -50,6 +55,8 @@ exports.scanCompleted = async function(callback) {
     })
 }
 
+
+// callback when led turned on
 exports.ledTurnedOnListener = async function(callback) {
     socket.on("event_lighting_started", (response) => {
         console.log("module: ", response);
@@ -57,6 +64,7 @@ exports.ledTurnedOnListener = async function(callback) {
     })
 }
 
+// callback when led turned off
 exports.ledTurnedOffListener = async function(callback) {
     socket.on("event_lighting_stopped", (response) => {
         console.log("module: ", response)
@@ -64,6 +72,7 @@ exports.ledTurnedOffListener = async function(callback) {
     })
 }
 
+// call this to get register with spacecode devices
 exports.connection = async function(callback) {
     socket.emit("connection", {"deviceType": "client"}, (response) => {
         console.log("module:",response);
@@ -85,6 +94,7 @@ exports.connection = async function(callback) {
     })
 }
 
+// call this to connect the device where deviceId can be the serial number of the device or the ipAddress
 exports.connectDevice = async function(deviceId, callback) {
     socket.emit("send_connectDevice", {
         "socketId": selectedSocketId,
@@ -103,6 +113,7 @@ exports.connectDevice = async function(deviceId, callback) {
     })
 }
 
+// call this to disconnect the device
 exports.disconnectDevice = async function(callback) {
     socket.emit("generic", {
         "eventName": "disconnectDevice",
@@ -118,6 +129,7 @@ exports.disconnectDevice = async function(callback) {
     })
 }
 
+// function to start scan
 let iteration = 0
 exports.startScan = async function(mode, callback) {
     socket.emit("generic", {
@@ -133,6 +145,7 @@ exports.startScan = async function(mode, callback) {
     })
 }
 
+// function to stop scan
 exports.stopScan = async function(callback) {
     socket.emit("generic", {
         "eventName": "stopScan",
@@ -144,6 +157,7 @@ exports.stopScan = async function(callback) {
     })
 }
 
+// function to turn the led on
 exports.ledOn = async function(tags, callback) {
     console.log("selectedSocketId", selectedSocketId)
     console.log("deviceId", connectDeviceSerialNumber)
@@ -161,6 +175,7 @@ exports.ledOn = async function(tags, callback) {
     })
 }
 
+// function to turn the led off
 exports.ledOff = async function(callback) {
     socket.emit("generic", {
         "eventName": "ledOff",
@@ -171,6 +186,7 @@ exports.ledOff = async function(callback) {
     })
 }
 
+// function to refresh the tag while having continues mode scanning
 exports.refreshTags = async function(callback) {
     socket.emit("generic", {
         "eventName": "refreshTags",

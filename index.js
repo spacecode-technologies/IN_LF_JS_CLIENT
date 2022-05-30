@@ -8,7 +8,7 @@ let connectDeviceSerialNumber = null;
 let deviceMode = null;
 
 // const socket = io("https://license.spacecode.in/", {
-const socket = io("http://localhost:5454/", {
+const socket = io("http://localhost:3000/", {
     reconnectionDelayMax: 10000,
     auth: {
         token: "v3"
@@ -51,6 +51,7 @@ exports.connection = async function(callback) {
         sockets.forEach((socketItem) => {
             if (!connectionSuccess) {
                 socket.emit("generic", {
+                    "type": "socket",
                     "eventName": "getDevices",
                     "socketId": socketItem.socketId
                 }, (response1) => {
@@ -66,6 +67,7 @@ exports.connection = async function(callback) {
 
 exports.connectDevice = async function(deviceId, callback) {
     socket.emit("send_connectDevice", {
+        "type": "socket",
         "socketId": selectedSocketId,
         deviceId
     }, (response) => {
@@ -84,6 +86,7 @@ exports.connectDevice = async function(deviceId, callback) {
 
 exports.disconnectDevice = async function(callback) {
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "disconnectDevice",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
@@ -100,6 +103,7 @@ exports.disconnectDevice = async function(callback) {
 let iteration = 0
 exports.startScan = async function(mode, callback) {
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "startScan",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
@@ -114,6 +118,7 @@ exports.startScan = async function(mode, callback) {
 
 exports.stopScan = async function(callback) {
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "stopScan",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
@@ -129,6 +134,7 @@ exports.ledOn = async function(tags, callback) {
     console.log("deviceMode", deviceMode)
     console.log("tags", tags)
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "ledOn",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
@@ -142,6 +148,7 @@ exports.ledOn = async function(tags, callback) {
 
 exports.ledOff = async function(callback) {
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "ledOff",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber
@@ -152,6 +159,7 @@ exports.ledOff = async function(callback) {
 
 exports.refreshTags = async function(callback) {
     socket.emit("generic", {
+        "type": "socket",
         "eventName": "refreshTags",
         "socketId": selectedSocketId,
         "deviceId": connectDeviceSerialNumber,
